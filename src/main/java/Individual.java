@@ -32,9 +32,9 @@ public class Individual {
 
     private void ensureCapacity() {
         if (this.size == this.accounts.length) {
-            Account[] newAccounts = new Account[this.size * 2];
-            System.arraycopy(this.accounts, 0, newAccounts, 0, this.size);
-            this.accounts = newAccounts;
+            Account[] grown = new Account[this.size * 2];
+            System.arraycopy(this.accounts, 0, grown, 0, this.size);
+            this.accounts = grown;
         }
     }
 
@@ -83,7 +83,7 @@ public class Individual {
     public Account removeAccountAt(int index) {
         Account removable = this.accounts[index];
         shiftLeft(index);
-        this.size--;
+        this.accounts[--this.size] = null;
         return removable;
     }
 
@@ -98,7 +98,7 @@ public class Individual {
             if (this.accounts[i].getNumber().equals(number)) {
                 Account removable = this.accounts[i];
                 shiftLeft(i);
-                this.size--;
+                this.accounts[--this.size] = null;
                 return removable;
             }
         }

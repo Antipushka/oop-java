@@ -34,10 +34,10 @@ public class AccountManager {
     }
 
     private void ensureCapacity() {
-        if (this.size == individuals.length) {
-            Individual[] newIndividuals = new Individual[this.size * 2];
-            System.arraycopy(this.individuals, 0, newIndividuals, 0, this.size);
-            this.individuals = newIndividuals;
+        if (this.size == this.individuals.length) {
+            Individual[] grown = new Individual[this.size * 2];
+            System.arraycopy(this.individuals, 0, grown, 0, this.size);
+            this.individuals = grown;
         }
     }
 
@@ -60,7 +60,7 @@ public class AccountManager {
     public Individual removeIndividualAt(int index) {
         Individual removable = this.individuals[index];
         shiftLeft(index);
-        this.size--;
+        this.individuals[--this.size] = null;
         return removable;
     }
 
