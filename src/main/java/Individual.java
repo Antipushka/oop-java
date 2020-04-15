@@ -40,19 +40,20 @@ public class Individual {
 
     public boolean addAccount(Account account, int index) {
         ensureCapacity();
-        shiftRight(index);
+        //todo а если это место пусто, надо ли двигать?
+        if (this.accounts[index] != null) {
+            shiftRight(index);
+            this.size++;
+        }
         this.accounts[index] = account;
-        this.size++;
         return true;
     }
 
     private void shiftRight(int startIndex) {
-        for (int i = this.size; i > startIndex; i--) {
-            this.accounts[i] = this.accounts[i - 1];
-        }
+        System.arraycopy(this.accounts, startIndex, this.accounts, startIndex + 1, this.size - startIndex);
     }
-
-    public Account getAccountAt(int index) {
+    //todo немного название смущает) почему не просто getAccount?
+    public Account getAccount(int index) {
         return this.accounts[index];
     }
 
@@ -64,23 +65,30 @@ public class Individual {
 
     public Account getAccountByNumber(String number) {
         for (int i = 0; i < this.size; i++) {
-            if (this.accounts[i].getNumber().equals(number)) {
+            //todo вынести логику сравнения в отдельный метод, а затем применять тут
+            if (checkNumber(this.accounts[i], number)) {
                 return this.accounts[i];
             }
         }
         return null;
     }
 
+    private boolean checkNumber(Account account, String number) {
+        return account.getNumber().equals(number);
+    }
+
     public boolean hasAccountWithNumber(String number) {
         for (int i = 0; i < this.size; i++) {
-            if (this.accounts[i].getNumber().equals(number)) {
+            //todo и тут
+            if (checkNumber(this.accounts[i], number)) {
                 return true;
             }
         }
         return false;
     }
 
-    public Account removeAccountAt(int index) {
+    //todo удаление сделать с универсальным названием removeAccount
+    public Account removeAccount(int index) {
         Account removable = this.accounts[index];
         shiftLeft(index);
         this.accounts[--this.size] = null;
@@ -88,14 +96,13 @@ public class Individual {
     }
 
     private void shiftLeft(int startIndex) {
-        for (int i = startIndex; i < this.size - 1; i++) {
-            this.accounts[i] = this.accounts[i + 1];
-        }
+        //todo опять почему не arraycopy?
+        System.arraycopy(this.accounts, startIndex + 1, this.accounts, startIndex, this.size - 1 - startIndex);
     }
 
-    public Account removeAccountByNumber(String number) {
+    public Account removeAccount(String number) {
         for (int i = 0; i < this.size; i++) {
-            if (this.accounts[i].getNumber().equals(number)) {
+            if (checkNumber(this.accounts[i], number)) {
                 Account removable = this.accounts[i];
                 shiftLeft(i);
                 this.accounts[--this.size] = null;
@@ -110,8 +117,14 @@ public class Individual {
     }
 
     public Account[] getAccounts() {
+        int j = 0;
         Account[] accounts = new Account[this.size];
-        System.arraycopy(this.accounts, 0, accounts, 0, this.size);
+        //todo зачем копировать, если ничего не меняется? могут ли здесь быть null'ы?
+        for (int i = 0; i < this.size; i++) {
+            if (this.accounts != null) {
+                accounts[j++] = this.accounts[i];
+            }
+        }
         return accounts;
     }
 

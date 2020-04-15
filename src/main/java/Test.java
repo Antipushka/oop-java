@@ -65,7 +65,7 @@ public class Test {
     }
 
     public static void removeTest(Individual individual) {
-        individual.removeAccountByNumber("8");
+        individual.removeAccount("8");
         System.out.println();
         System.out.println("Remove: ");
         printAccounts(individual.getAccounts());

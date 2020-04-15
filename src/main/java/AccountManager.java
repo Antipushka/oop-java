@@ -1,6 +1,8 @@
 /**
  * @author Dmitriy Antipin
  */
+
+//todo комментарии из Individual применимы сюда
 public class AccountManager {
 
     private static final int DEFAULT_SIZE = 0;
@@ -27,9 +29,11 @@ public class AccountManager {
 
     public boolean addIndividual(Individual individual, int index) {
         ensureCapacity();
-        shiftRight(index);
+        if (this.individuals[index] != null) {
+            shiftRight(index);
+            this.size++;
+        }
         this.individuals[index] = individual;
-        this.size++;
         return true;
     }
 
@@ -47,7 +51,7 @@ public class AccountManager {
         }
     }
 
-    public Individual getIndividualAt(int index) {
+    public Individual getIndividual(int index) {
         return this.individuals[index];
     }
 
@@ -57,7 +61,7 @@ public class AccountManager {
         return replaceable;
     }
 
-    public Individual removeIndividualAt(int index) {
+    public Individual removeIndividual(int index) {
         Individual removable = this.individuals[index];
         shiftLeft(index);
         this.individuals[--this.size] = null;
@@ -75,8 +79,13 @@ public class AccountManager {
     }
 
     public Individual[] getIndividuals() {
+        int j = 0;
         Individual[] individuals = new Individual[this.size];
-        System.arraycopy(this.individuals, 0, individuals, 0, this.size);
+        for (int i = 0; i < this.size; i++) {
+            if (this.individuals[i] != null) {
+                individuals[j++] = this.individuals[i];
+            }
+        }
         return individuals;
     }
 
@@ -96,7 +105,7 @@ public class AccountManager {
         return sortedIndividuals;
     }
 
-    public Account getAccountByNumber(String accountNumber) {
+    public Account getAccount(String accountNumber) {
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
@@ -105,11 +114,11 @@ public class AccountManager {
         return account;
     }
 
-    public Account removeAccountByNumber(String accountNumber) {
+    public Account removeAccount(String accountNumber) {
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
-            account = this.individuals[i++].removeAccountByNumber(accountNumber);
+            account = this.individuals[i++].removeAccount(accountNumber);
         }
         return account;
     }
@@ -117,7 +126,7 @@ public class AccountManager {
     public Account setAccount(String accountNumber, Account account) {
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.individuals[i].size(); j++) {
-                if (this.individuals[i].getAccountAt(j).getNumber().equals(accountNumber)) {
+                if (this.individuals[i].getAccount(j).getNumber().equals(accountNumber)) {
                     return this.individuals[i].setAccount(account, j);
                 }
             }
