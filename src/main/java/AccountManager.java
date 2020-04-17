@@ -7,70 +7,70 @@ public class AccountManager {
 
     private static final int DEFAULT_SIZE = 0;
 
-    private Individual[] individuals;
+    private Client[] clients;
     private int size;
 
     public AccountManager(int initialCapacity) {
-        this.individuals = new Individual[initialCapacity];
+        this.clients = new Client[initialCapacity];
         this.size = DEFAULT_SIZE;
     }
 
-    public AccountManager(Individual[] individuals) {
-        this.individuals = new Individual[individuals.length];
-        System.arraycopy(individuals, 0, this.individuals, 0, individuals.length);
-        this.size = individuals.length;
+    public AccountManager(Client[] clients) {
+        this.clients = new Client[clients.length];
+        System.arraycopy(clients, 0, this.clients, 0, clients.length);
+        this.size = clients.length;
     }
 
-    public boolean addIndividual(Individual individual) {
+    public boolean addIndividual(Client client) {
         ensureCapacity();
-        this.individuals[this.size++] = individual;
+        this.clients[this.size++] = client;
         return true;
     }
 
-    public boolean addIndividual(Individual individual, int index) {
+    public boolean addIndividual(Client client, int index) {
         ensureCapacity();
-        if (this.individuals[index] != null) {
+        if (this.clients[index] != null) {
             shiftRight(index);
             this.size++;
         }
-        this.individuals[index] = individual;
+        this.clients[index] = client;
         return true;
     }
 
     private void ensureCapacity() {
-        if (this.size == this.individuals.length) {
-            Individual[] grown = new Individual[this.size * 2];
-            System.arraycopy(this.individuals, 0, grown, 0, this.size);
-            this.individuals = grown;
+        if (this.size == this.clients.length) {
+            Client[] grown = new Client[this.size * 2];
+            System.arraycopy(this.clients, 0, grown, 0, this.size);
+            this.clients = grown;
         }
     }
 
     private void shiftRight(int startIndex) {
         for (int i = this.size; i > startIndex; i--) {
-            this.individuals[i] = this.individuals[i - 1];
+            this.clients[i] = this.clients[i - 1];
         }
     }
 
-    public Individual getIndividual(int index) {
-        return this.individuals[index];
+    public Client getIndividual(int index) {
+        return this.clients[index];
     }
 
-    public Individual setIndividual(Individual individual, int index) {
-        Individual replaceable = this.individuals[index];
-        this.individuals[index] = individual;
+    public Client setIndividual(Individual individual, int index) {
+        Client replaceable = this.clients[index];
+        this.clients[index] = individual;
         return replaceable;
     }
 
-    public Individual removeIndividual(int index) {
-        Individual removable = this.individuals[index];
+    public Client removeIndividual(int index) {
+        Client removable = this.clients[index];
         shiftLeft(index);
-        this.individuals[--this.size] = null;
+        this.clients[--this.size] = null;
         return removable;
     }
 
     private void shiftLeft(int startIndex) {
         for (int i = startIndex; i < this.size - 1; i++) {
-            this.individuals[i] = this.individuals[i + 1];
+            this.clients[i] = this.clients[i + 1];
         }
     }
 
@@ -78,38 +78,38 @@ public class AccountManager {
         return this.size;
     }
 
-    public Individual[] getIndividuals() {
+    public Client[] getClients() {
         int j = 0;
-        Individual[] individuals = new Individual[this.size];
+        Client[] clients = new Client[this.size];
         for (int i = 0; i < this.size; i++) {
-            if (this.individuals[i] != null) {
-                individuals[j++] = this.individuals[i];
+            if (this.clients[i] != null) {
+                clients[j++] = this.clients[i];
             }
         }
-        return individuals;
+        return clients;
     }
 
-    public Individual[] sortedByBalanceIndividuals() {
-        Individual[] sortedIndividuals = new Individual[this.size];
+    public Client[] sortedByBalanceIndividuals() {
+        Client[] sortedClients = new Client[this.size];
         int j;
         double totalBalance;
         for (int i = 0; i < this.size; i++) {
             j = i;
-            totalBalance = this.individuals[i].totalBalance();
-            while (j > 0 && sortedIndividuals[j - 1].totalBalance() > totalBalance) {
-                sortedIndividuals[j] = sortedIndividuals[j - 1];
+            totalBalance = this.clients[i].totalBalance();
+            while (j > 0 && sortedClients[j - 1].totalBalance() > totalBalance) {
+                sortedClients[j] = sortedClients[j - 1];
                 j--;
             }
-            sortedIndividuals[j] = this.individuals[i];
+            sortedClients[j] = this.clients[i];
         }
-        return sortedIndividuals;
+        return sortedClients;
     }
 
     public Account getAccount(String accountNumber) {
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
-            account = this.individuals[i++].getAccountByNumber(accountNumber);
+            account = this.clients[i++].getAccount(accountNumber);
         }
         return account;
     }
@@ -118,16 +118,16 @@ public class AccountManager {
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
-            account = this.individuals[i++].removeAccount(accountNumber);
+            account = this.clients[i++].removeAccount(accountNumber);
         }
         return account;
     }
 
-    public Account setAccount(String accountNumber, Account account) {
+    public Account setAccount(String accountNumber, DebitAccount account) {
         for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.individuals[i].size(); j++) {
-                if (this.individuals[i].getAccount(j).getNumber().equals(accountNumber)) {
-                    return this.individuals[i].setAccount(account, j);
+            for (int j = 0; j < this.clients[i].size(); j++) {
+                if (this.clients[i].getAccount(j).getNumber().equals(accountNumber)) {
+                    return this.clients[i].setAccount(account, j);
                 }
             }
         }

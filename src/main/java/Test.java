@@ -5,17 +5,17 @@ public class Test {
 
     public static void main(String[] args) {
 
-        Account account = new Account("9", 9);
-        Account account1 = new Account("8", 8);
-        Account account2 = new Account("7", 7);
-        Account account3 = new Account("6", 6);
-        Account account4 = new Account("5", 5);
-        Account account5 = new Account("4", 4);
-        Account account6 = new Account("3", 3);
-        Account account7 = new Account("2", 2);
-        Account account8 = new Account("1", 1);
+        DebitAccount account = new DebitAccount("9", 9);
+        DebitAccount account1 = new DebitAccount("8", 8);
+        DebitAccount account2 = new DebitAccount("7", 7);
+        DebitAccount account3 = new DebitAccount("6", 6);
+        DebitAccount account4 = new DebitAccount("5", 5);
+        DebitAccount account5 = new DebitAccount("4", 4);
+        DebitAccount account6 = new DebitAccount("3", 3);
+        DebitAccount account7 = new DebitAccount("2", 2);
+        DebitAccount account8 = new DebitAccount("1", 1);
 
-        Account[] accounts = { account, account1, account2 };
+        DebitAccount[] accounts = { account, account1, account2 };
 
         Individual individual = new Individual(accounts);
 
@@ -58,7 +58,7 @@ public class Test {
         printTotalBalances(accountManager.sortedByBalanceIndividuals());
     }
 
-    public static void printAccounts(Account[] accounts) {
+    public static void printAccounts(DebitAccount[] accounts) {
         for (int i = 0; i < accounts.length; i++) {
             System.out.println("Number: " + accounts[i].getNumber() + " Balance: " + accounts[i].getBalance());
         }
@@ -72,7 +72,7 @@ public class Test {
     }
 
     public static void setTest(Individual individual) {
-        individual.setAccount(new Account("123", 123), 1);
+        individual.setAccount(new DebitAccount("123", 123), 1);
         System.out.println();
         System.out.println("Set: ");
         printAccounts(individual.getAccounts());

@@ -1,7 +1,7 @@
 /**
  * @author Dmitriy Antipin
  */
-public class Individual {
+public class Individual implements Client {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int DEFAULT_SIZE = 0;
@@ -19,11 +19,12 @@ public class Individual {
     }
 
     public Individual(Account[] accounts) {
-        this.accounts = new Account[accounts.length];
+        this.accounts = new DebitAccount[accounts.length];
         System.arraycopy(accounts, 0, this.accounts, 0, accounts.length);
         this.size = accounts.length;
     }
 
+    @Override
     public boolean addAccount(Account account) {
         ensureCapacity();
         this.accounts[size++] = account;
@@ -38,6 +39,7 @@ public class Individual {
         }
     }
 
+    @Override
     public boolean addAccount(Account account, int index) {
         ensureCapacity();
         //todo а если это место пусто, надо ли двигать?
@@ -52,20 +54,22 @@ public class Individual {
     private void shiftRight(int startIndex) {
         System.arraycopy(this.accounts, startIndex, this.accounts, startIndex + 1, this.size - startIndex);
     }
-    //todo немного название смущает) почему не просто getAccount?
+
+    @Override
     public Account getAccount(int index) {
         return this.accounts[index];
     }
 
+    @Override
     public Account setAccount(Account account, int index) {
         Account replaceable = this.accounts[index];
         this.accounts[index] = account;
         return replaceable;
     }
 
-    public Account getAccountByNumber(String number) {
+    @Override
+    public Account getAccount(String number) {
         for (int i = 0; i < this.size; i++) {
-            //todo вынести логику сравнения в отдельный метод, а затем применять тут
             if (checkNumber(this.accounts[i], number)) {
                 return this.accounts[i];
             }
@@ -77,7 +81,8 @@ public class Individual {
         return account.getNumber().equals(number);
     }
 
-    public boolean hasAccountWithNumber(String number) {
+    @Override
+    public boolean hasAccount(String number) {
         for (int i = 0; i < this.size; i++) {
             //todo и тут
             if (checkNumber(this.accounts[i], number)) {
@@ -88,6 +93,7 @@ public class Individual {
     }
 
     //todo удаление сделать с универсальным названием removeAccount
+    @Override
     public Account removeAccount(int index) {
         Account removable = this.accounts[index];
         shiftLeft(index);
@@ -100,6 +106,7 @@ public class Individual {
         System.arraycopy(this.accounts, startIndex + 1, this.accounts, startIndex, this.size - 1 - startIndex);
     }
 
+    @Override
     public Account removeAccount(String number) {
         for (int i = 0; i < this.size; i++) {
             if (checkNumber(this.accounts[i], number)) {
@@ -112,13 +119,15 @@ public class Individual {
         return null;
     }
 
+    @Override
     public int size() {
         return this.size;
     }
 
+    @Override
     public Account[] getAccounts() {
         int j = 0;
-        Account[] accounts = new Account[this.size];
+        Account[] accounts = new DebitAccount[this.size];
         //todo зачем копировать, если ничего не меняется? могут ли здесь быть null'ы?
         for (int i = 0; i < this.size; i++) {
             if (this.accounts != null) {
@@ -128,8 +137,9 @@ public class Individual {
         return accounts;
     }
 
+    @Override
     public Account[] sortedAccountsByBalance() {
-        Account[] sortedAccounts = new Account[this.size];
+        Account[] sortedAccounts = new DebitAccount[this.size];
         int j;
         for (int i = 0; i < this.size; i++) {
             j = i;
@@ -142,6 +152,7 @@ public class Individual {
         return sortedAccounts;
     }
 
+    @Override
     public double totalBalance() {
         double totalBalance = 0;
         for (int i = 0; i < this.size; i++) {
