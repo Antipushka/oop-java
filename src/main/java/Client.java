@@ -26,4 +26,26 @@ public interface Client {
     Account[] sortedAccountsByBalance();
 
     double totalBalance();
+
+    int getCreditScores();
+
+    void increaseCreditScores(int value);
+
+    Account[] getCredits();
+
+    int countCredits();
+
+    default ClientStatus getStatus() {
+        if (getCreditScores() <= ClientStatus.BAD.getCreditScoreBound()) {
+            return ClientStatus.BAD;
+        } else if (getCreditScores() >= ClientStatus.RISKY.getCreditScoreBound() &&
+                getCreditScores() < ClientStatus.GOOD.getCreditScoreBound()) {
+            return ClientStatus.RISKY;
+        } else if (getCreditScores() >= ClientStatus.GOOD.getCreditScoreBound() &&
+                getCreditScores() < ClientStatus.GOLD.getCreditScoreBound()) {
+            return ClientStatus.GOLD;
+        } else {
+            return ClientStatus.PLATINUM;
+        }
+    }
 }

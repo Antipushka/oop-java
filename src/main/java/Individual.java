@@ -1,3 +1,5 @@
+import java.text.ParseException;
+
 /**
  * @author Dmitriy Antipin
  */
@@ -5,9 +7,11 @@ public class Individual implements Client {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int DEFAULT_SIZE = 0;
+    private static final int DEFAULT_CREDIT_SCORE = 0;
 
     private Account[] accounts;
     private int size;
+    private int creditScore;
 
     public Individual() {
         this(DEFAULT_INITIAL_CAPACITY);
@@ -16,12 +20,14 @@ public class Individual implements Client {
     public Individual(int initialCapacity) {
         this.accounts = new Account[initialCapacity];
         this.size = DEFAULT_SIZE;
+        this.creditScore = DEFAULT_CREDIT_SCORE;
     }
 
     public Individual(Account[] accounts) {
         this.accounts = new DebitAccount[accounts.length];
         System.arraycopy(accounts, 0, this.accounts, 0, accounts.length);
         this.size = accounts.length;
+        this.creditScore = DEFAULT_CREDIT_SCORE;
     }
 
     @Override
@@ -159,5 +165,37 @@ public class Individual implements Client {
             totalBalance += this.accounts[i].getBalance();
         }
         return totalBalance;
+    }
+
+    @Override
+    public int getCreditScores() {
+        return this.creditScore;
+    }
+
+    @Override
+    public void increaseCreditScores(int value) {
+        this.creditScore += value;
+    }
+
+    @Override
+    public Account[] getCredits() {
+        Account[] credits = new Account[countCredits()];
+        int j = 0;
+        for (int i = 0; i < this.size; i++) {
+            if (this.accounts[i] instanceof Credit) {
+                credits[j++] = this.accounts[i];
+            }
+        }
+        return credits;
+    }
+
+    public int countCredits() {
+        int quantity = 0;
+        for (int i = 0; i < this.size; i++) {
+            if (this.accounts[i] instanceof Credit) {
+                quantity++;
+            }
+        }
+        return quantity;
     }
 }

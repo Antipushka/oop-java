@@ -58,7 +58,7 @@ public class Test {
         printTotalBalances(accountManager.sortedByBalanceIndividuals());
     }
 
-    public static void printAccounts(DebitAccount[] accounts) {
+    public static void printAccounts(Account[] accounts) {
         for (int i = 0; i < accounts.length; i++) {
             System.out.println("Number: " + accounts[i].getNumber() + " Balance: " + accounts[i].getBalance());
         }
@@ -89,10 +89,10 @@ public class Test {
         System.out.println("Total balance: " + individual.totalBalance());
     }
 
-    public static  void printTotalBalances(Individual[] individuals) {
+    public static  void printTotalBalances(Client[] clients) {
         System.out.println();
-        for (int i = 0; i < individuals.length; i++) {
-            System.out.println("Total balance " + i +": " + individuals[i].totalBalance());
+        for (int i = 0; i < clients.length; i++) {
+            System.out.println("Total balance " + i +": " + clients[i].totalBalance());
         }
     }
 }

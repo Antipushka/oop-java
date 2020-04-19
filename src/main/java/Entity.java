@@ -1,3 +1,5 @@
+import java.text.ParseException;
+
 /**
  * @author Dmitriy Antipin
  */
@@ -5,10 +7,12 @@ public class Entity implements Client {
 
     private static final String DEFAULT_TITLE = "";
     private static final int DEFAULT_SIZE = 0;
+    private  static final int DEFAULT_CREDIT_SCORE = 0;
 
     private String title;
     private Node head;
     private Node tail;
+    private int creditScore;
     private int size;
 
     public Entity() {
@@ -21,11 +25,13 @@ public class Entity implements Client {
         this.tail = this.head;
         this.head.next = this.tail;
         this.size = DEFAULT_SIZE;
+        this.creditScore = DEFAULT_CREDIT_SCORE;
     }
 
     public Entity(String title, Account[] accounts) {
         this(title);
         addAll(accounts);
+        this.creditScore = DEFAULT_CREDIT_SCORE;
     }
 
     public boolean addAll(Account[] accounts) {
@@ -171,6 +177,40 @@ public class Entity implements Client {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public int getCreditScores() {
+        return this.creditScore;
+    }
+
+    @Override
+    public void increaseCreditScores(int value) {
+        this.creditScore += value;
+    }
+
+    @Override
+    public Account[] getCredits() {
+        Account[] credits = new Account[countCredits()];
+        int i = 0;
+        for (Node node = this.head.next; node != this.head; node = node.next) {
+            if (node.account instanceof Credit) {
+                credits[i++] = node.account;
+            }
+        }
+        return credits;
+    }
+
+    public int countCredits() {
+        int quantity = 0;
+        Node node = this.head.next;
+        while (node != this.head) {
+            if (node.account instanceof Credit) {
+                quantity++;
+            }
+            node = node.next;
+        }
+        return quantity;
     }
 
     private static class Node {

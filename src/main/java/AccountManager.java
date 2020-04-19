@@ -133,4 +133,48 @@ public class AccountManager {
         }
         return null;
     }
+
+    public Client[] getDebtors() {
+        int j = 0;
+        Client[] debtors = new Client[countDebtors()];
+        for (int i = 0; i < this.size; i++) {
+            if (this.clients[i].countCredits() > 0) {
+                debtors[j++] = this.clients[i];
+            }
+        }
+        return debtors;
+    }
+
+    public Client[] getWickedDebtors() {
+        int j = 0;
+        Client[] wickedDebtors = new Client[countWickedDebtors()];
+        for (int i = 0; i < this.size; i++) {
+            if (this.clients[i].countCredits() > 0 &&
+                    this.clients[i].getStatus() == ClientStatus.BAD) {
+                wickedDebtors[j++] = this.clients[i];
+            }
+        }
+        return wickedDebtors;
+    }
+
+    private int countDebtors() {
+        int quantity = 0;
+        for (int i = 0; i < this.size; i++) {
+            if (this.clients[i].countCredits() > 0) {
+                quantity++;
+            }
+        }
+        return quantity;
+    }
+
+    private int countWickedDebtors() {
+        int quantity = 0;
+        for (int i = 0; i < this.size; i++) {
+            if (this.clients[i].countCredits() > 0 &&
+                    this.clients[i].getStatus() == ClientStatus.BAD) {
+                quantity++;
+            }
+        }
+        return quantity;
+    }
 }
