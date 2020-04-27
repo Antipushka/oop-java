@@ -2,7 +2,6 @@
  * @author Dmitriy Antipin
  */
 
-//todo комментарии из Individual применимы сюда
 public class AccountManager {
 
     private static final int DEFAULT_SIZE = 0;
@@ -61,7 +60,7 @@ public class AccountManager {
         return replaceable;
     }
 
-    public Client removeIndividual(int index) {
+    public Client removeClient(int index) {
         Client removable = this.clients[index];
         shiftLeft(index);
         this.clients[--this.size] = null;
@@ -176,5 +175,33 @@ public class AccountManager {
             }
         }
         return quantity;
+    }
+
+    public boolean removeClient(Client client) {
+        for (int i = 0; i < this.size; i++) {
+            if (this.clients[i].equals(client)) {
+                removeClient(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int indexOf(Client client) {
+        for (int i = 0; i < this.size; i++) {
+            if (this.clients[i].equals(client)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < this.size; i++) {
+            stringBuilder.append(this.clients[i].toString()).append('\n');
+        }
+        return stringBuilder.toString();
     }
 }

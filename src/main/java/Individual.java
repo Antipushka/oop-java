@@ -1,14 +1,13 @@
-import java.text.ParseException;
-
 /**
  * @author Dmitriy Antipin
  */
-public class Individual implements Client {
+public class Individual implements Client, Cloneable {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
     private static final int DEFAULT_SIZE = 0;
     private static final int DEFAULT_CREDIT_SCORE = 0;
 
+    private String name;
     private Account[] accounts;
     private int size;
     private int creditScore;
@@ -48,7 +47,6 @@ public class Individual implements Client {
     @Override
     public boolean addAccount(Account account, int index) {
         ensureCapacity();
-        //todo а если это место пусто, надо ли двигать?
         if (this.accounts[index] != null) {
             shiftRight(index);
             this.size++;
@@ -90,7 +88,6 @@ public class Individual implements Client {
     @Override
     public boolean hasAccount(String number) {
         for (int i = 0; i < this.size; i++) {
-            //todo и тут
             if (checkNumber(this.accounts[i], number)) {
                 return true;
             }
@@ -98,7 +95,6 @@ public class Individual implements Client {
         return false;
     }
 
-    //todo удаление сделать с универсальным названием removeAccount
     @Override
     public Account removeAccount(int index) {
         Account removable = this.accounts[index];
@@ -134,7 +130,6 @@ public class Individual implements Client {
     public Account[] getAccounts() {
         int j = 0;
         Account[] accounts = new DebitAccount[this.size];
-        //todo зачем копировать, если ничего не меняется? могут ли здесь быть null'ы?
         for (int i = 0; i < this.size; i++) {
             if (this.accounts != null) {
                 accounts[j++] = this.accounts[i];
@@ -197,5 +192,92 @@ public class Individual implements Client {
             }
         }
         return quantity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean removeAccount(Account account) {
+        for (int i = 0; i < this.size; i++) {
+            if (this.accounts[i].equals(account)) {
+                removeAccount(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int indexOf(Account account) {
+        for (int i = 0; i < this.size; i++) {
+            if (this.accounts[i].equals(account)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public double totalDebt() {
+        Account account;
+        double totalDebt = 0;
+        for (int i = 0; i < this.size; i++) {
+            account = this.accounts[i];
+            if (account instanceof CreditAccount) {
+                totalDebt += (account.getBalance() / 100)
+                        * ((CreditAccount) account).getAnnualPercentageRate();
+            }
+        }
+        return totalDebt;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Client\n name: ")
+                .append(this.name).append('\n')
+                .append("creditScore: ").append(this.creditScore).append('\n');
+        for (int i = 0; i < this.size; i++) {
+            sb.append(this.accounts[i].toString()).append('\n');
+        }
+        sb.append("total: ").append(totalBalance());
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Individual that = (Individual) o;
+        boolean equals = this.size == that.size &&
+                this.creditScore == that.creditScore &&
+                this.name.equals(that.name);
+        if (equals) {
+            for (int i = 0; i < this.size; i++) {
+                if (!this.accounts[i].equals(that.accounts[i])) {
+                    return false;
+                }
+            }
+        }
+        return equals;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = this.name.hashCode() ^ this.size ^ this.creditScore;
+        for (int i = 0; i < this.size; i++) {
+            result ^= this.accounts.hashCode();
+        }
+        return result;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

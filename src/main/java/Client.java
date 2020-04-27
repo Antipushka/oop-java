@@ -19,6 +19,12 @@ public interface Client {
 
     Account removeAccount(String number);
 
+    boolean removeAccount(Account account);
+
+    int indexOf(Account account);
+
+    double totalDebt();
+
     int size();
 
     Account[] getAccounts();

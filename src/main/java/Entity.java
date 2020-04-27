@@ -1,9 +1,11 @@
 import java.text.ParseException;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * @author Dmitriy Antipin
  */
-public class Entity implements Client {
+public class Entity implements Client, Cloneable {
 
     private static final String DEFAULT_TITLE = "";
     private static final int DEFAULT_SIZE = 0;
@@ -213,6 +215,93 @@ public class Entity implements Client {
         return quantity;
     }
 
+    @Override
+    public boolean removeAccount(Account account) {
+        for (Node node = this.head.next; node != this.head; node = node.next) {
+            if (node.next.account.equals(account)) {
+                node.next = node.next.next;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int indexOf(Account account) {
+        Node node = this.head.next;
+        for (int i = 0; i < this.size; i++) {
+            if (node.account.equals(account)) {
+                return i;
+            }
+            node = node.next;
+        }
+        return -1;
+    }
+
+    @Override
+    public double totalDebt() {
+        Account account;
+        double totalDebt = 0;
+        for (Node node = this.head.next; node != this.head; node = node.next) {
+            account = node.account;
+            if (account instanceof CreditAccount) {
+                totalDebt += (account.getBalance() / 100)
+                        * ((CreditAccount) account).getAnnualPercentageRate();
+            }
+        }
+        return totalDebt;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Client\n title: ")
+                .append(this.title).append('\n')
+                .append("creditScore: ").append(this.creditScore).append('\n');
+        for (Node node = this.head.next; node != this.head; node = node.next) {
+            sb.append(node.account.toString()).append('\n');
+        }
+        sb.append("total: ").append(totalBalance());
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Entity entity = (Entity) o;
+        boolean equals = this.creditScore == entity.creditScore &&
+                this.size == entity.size &&
+                this.title.equals(entity.title) &&
+                this.head.equals(entity.head) &&
+                this.tail.equals(entity.tail);
+        if (equals) {
+            Node thisNode = this.head.next;
+            Node thatNode = entity.head.next;
+            while (thisNode != this.head) {
+                if (!thisNode.account.equals(thatNode.account)) {
+                    return false;
+                }
+                thisNode = thisNode.next;
+                thatNode = thatNode.next;
+            }
+        }
+        return equals;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = this.title.hashCode() ^ this.creditScore ^ this.size;
+        for (Node node = this.head.next; node != this.head; node = node.next) {
+            result ^= node.account.hashCode();
+        }
+        return result;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     private static class Node {
 
         Account account;
@@ -229,6 +318,20 @@ public class Entity implements Client {
         private Node(Account account, Node next) {
             this.account = account;
             this.next = next;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node node = (Node) o;
+            return this.account.equals(node.account) &&
+                    this.next.equals(node.next);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(account, next);
         }
     }
 }
