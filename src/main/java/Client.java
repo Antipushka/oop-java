@@ -3,9 +3,11 @@
  */
 public interface Client {
 
-    boolean addAccount(Account account);
+    String NUMBER_REGEX_PATTERN = "4[045]\\d{3}810\\d{4}[1-9]\\d{6}[1-9]";
 
-    boolean addAccount(Account account, int index);
+    boolean addAccount(Account account) throws DublicateAccountNumberException;
+
+    boolean addAccount(Account account, int index) throws DublicateAccountNumberException;
 
     Account getAccount(int index);
 
@@ -13,7 +15,7 @@ public interface Client {
 
     boolean hasAccount(String number);
 
-    Account setAccount(Account account, int index);
+    Account setAccount(Account account, int index) throws DublicateAccountNumberException;
 
     Account removeAccount(int index);
 

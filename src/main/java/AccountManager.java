@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 /**
  * @author Dmitriy Antipin
  */
@@ -21,12 +23,15 @@ public class AccountManager {
     }
 
     public boolean addIndividual(Client client) {
+        Objects.requireNonNull(client);
         ensureCapacity();
         this.clients[this.size++] = client;
         return true;
     }
 
     public boolean addIndividual(Client client, int index) {
+        Objects.requireNonNull(client);
+        checkIndex(index);
         ensureCapacity();
         if (this.clients[index] != null) {
             shiftRight(index);
@@ -51,16 +56,20 @@ public class AccountManager {
     }
 
     public Client getIndividual(int index) {
+        checkIndex(index);
         return this.clients[index];
     }
 
     public Client setIndividual(Individual individual, int index) {
+        Objects.requireNonNull(individual);
+        checkIndex(index);
         Client replaceable = this.clients[index];
         this.clients[index] = individual;
         return replaceable;
     }
 
     public Client removeClient(int index) {
+        checkIndex(index);
         Client removable = this.clients[index];
         shiftLeft(index);
         this.clients[--this.size] = null;
@@ -105,6 +114,7 @@ public class AccountManager {
     }
 
     public Account getAccount(String accountNumber) {
+        Objects.requireNonNull(accountNumber);
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
@@ -114,6 +124,7 @@ public class AccountManager {
     }
 
     public Account removeAccount(String accountNumber) {
+        Objects.requireNonNull(accountNumber);
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
@@ -122,7 +133,9 @@ public class AccountManager {
         return account;
     }
 
-    public Account setAccount(String accountNumber, DebitAccount account) {
+    public Account setAccount(String accountNumber, DebitAccount account) throws DublicateAccountNumberException {
+        Objects.requireNonNull(accountNumber);
+        Objects.requireNonNull(account);
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.clients[i].size(); j++) {
                 if (this.clients[i].getAccount(j).getNumber().equals(accountNumber)) {
@@ -178,6 +191,7 @@ public class AccountManager {
     }
 
     public boolean removeClient(Client client) {
+        Objects.requireNonNull(client);
         for (int i = 0; i < this.size; i++) {
             if (this.clients[i].equals(client)) {
                 removeClient(i);
@@ -188,12 +202,19 @@ public class AccountManager {
     }
 
     public int indexOf(Client client) {
+        Objects.requireNonNull(client);
         for (int i = 0; i < this.size; i++) {
             if (this.clients[i].equals(client)) {
                 return i;
             }
         }
         return -1;
+    }
+
+    private void checkIndex(int index) {
+        if (index < 0 || index >= this.size) {
+            throw new IndexOutOfBoundsException();
+        }
     }
 
     @Override

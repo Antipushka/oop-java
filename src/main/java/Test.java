@@ -1,21 +1,23 @@
+import java.time.LocalDate;
+import java.util.regex.Pattern;
+
 /**
  * @author Dmitriy Antipin
  */
 public class Test {
-
     public static void main(String[] args) {
 
-        DebitAccount account = new DebitAccount("9", 9);
-        DebitAccount account1 = new DebitAccount("8", 8);
-        DebitAccount account2 = new DebitAccount("7", 7);
-        DebitAccount account3 = new DebitAccount("6", 6);
-        DebitAccount account4 = new DebitAccount("5", 5);
-        DebitAccount account5 = new DebitAccount("4", 4);
-        DebitAccount account6 = new DebitAccount("3", 3);
-        DebitAccount account7 = new DebitAccount("2", 2);
-        DebitAccount account8 = new DebitAccount("1", 1);
+        /*DebitAccount account0 = new DebitAccount("9", LocalDate.now());
+        DebitAccount account1 = new DebitAccount("8", LocalDate.now());
+        DebitAccount account2 = new DebitAccount("7", LocalDate.now());
+        DebitAccount account3 = new DebitAccount("6", LocalDate.now());
+        DebitAccount account4 = new DebitAccount("5", LocalDate.now());
+        DebitAccount account5 = new DebitAccount("4", LocalDate.now());
+        DebitAccount account6 = new DebitAccount("3", LocalDate.now());
+        DebitAccount account7 = new DebitAccount("2", LocalDate.now());
+        DebitAccount account8 = new DebitAccount("1", LocalDate.now());
 
-        DebitAccount[] accounts = { account, account1, account2 };
+        Account[] accounts = { account0, account1, account2 };
 
         Individual individual = new Individual(accounts);
 
@@ -55,7 +57,9 @@ public class Test {
         AccountManager accountManager = new AccountManager(individuals);
         accountManager.addIndividual(individual2);
 
-        printTotalBalances(accountManager.sortedByBalanceIndividuals());
+        printTotalBalances(accountManager.sortedByBalanceIndividuals());*/
+        String regex = "4[4-5]\\d{3}810\\d{4}[1-9]\\d{6}[1-9]";
+        System.out.println(Pattern.compile(regex).matcher("45333810555512222271").matches());
     }
 
     public static void printAccounts(Account[] accounts) {
@@ -72,7 +76,7 @@ public class Test {
     }
 
     public static void setTest(Individual individual) {
-        individual.setAccount(new DebitAccount("123", 123), 1);
+        individual.setAccount(new DebitAccount("123", LocalDate.now()), 1);
         System.out.println();
         System.out.println("Set: ");
         printAccounts(individual.getAccounts());

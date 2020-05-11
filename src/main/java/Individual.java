@@ -1,3 +1,7 @@
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
 /**
  * @author Dmitriy Antipin
  */
@@ -30,7 +34,9 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public boolean addAccount(Account account) {
+    public boolean addAccount(Account account) throws DublicateAccountNumberException {
+        throwExceptionIfHasAccount(account.getNumber());
+        Objects.requireNonNull(account);
         ensureCapacity();
         this.accounts[size++] = account;
         return true;
@@ -45,7 +51,10 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public boolean addAccount(Account account, int index) {
+    public boolean addAccount(Account account, int index) throws DublicateAccountNumberException {
+        throwExceptionIfHasAccount(account.getNumber());
+        Objects.requireNonNull(account);
+        checkIndex(index);
         ensureCapacity();
         if (this.accounts[index] != null) {
             shiftRight(index);
@@ -61,11 +70,15 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public Account getAccount(int index) {
+        checkIndex(index);
         return this.accounts[index];
     }
 
     @Override
-    public Account setAccount(Account account, int index) {
+    public Account setAccount(Account account, int index) throws DublicateAccountNumberException {
+        throwExceptionIfHasAccount(account.getNumber());
+        Objects.requireNonNull(account);
+        checkIndex(index);
         Account replaceable = this.accounts[index];
         this.accounts[index] = account;
         return replaceable;
@@ -73,12 +86,14 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public Account getAccount(String number) {
+        Objects.requireNonNull(number);
+        checkNumber(number);
         for (int i = 0; i < this.size; i++) {
             if (checkNumber(this.accounts[i], number)) {
                 return this.accounts[i];
             }
         }
-        return null;
+        throw new NoSuchElementException();
     }
 
     private boolean checkNumber(Account account, String number) {
@@ -87,6 +102,8 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public boolean hasAccount(String number) {
+        Objects.requireNonNull(number);
+        checkNumber(number);
         for (int i = 0; i < this.size; i++) {
             if (checkNumber(this.accounts[i], number)) {
                 return true;
@@ -97,6 +114,7 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public Account removeAccount(int index) {
+        checkIndex(index);
         Account removable = this.accounts[index];
         shiftLeft(index);
         this.accounts[--this.size] = null;
@@ -110,6 +128,8 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public Account removeAccount(String number) {
+        Objects.requireNonNull(number);
+        checkNumber(number);
         for (int i = 0; i < this.size; i++) {
             if (checkNumber(this.accounts[i], number)) {
                 Account removable = this.accounts[i];
@@ -118,7 +138,7 @@ public class Individual implements Client, Cloneable {
                 return removable;
             }
         }
-        return null;
+        throw new NoSuchElementException();
     }
 
     @Override
@@ -204,17 +224,19 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public boolean removeAccount(Account account) {
+        Objects.requireNonNull(account);
         for (int i = 0; i < this.size; i++) {
             if (this.accounts[i].equals(account)) {
                 removeAccount(i);
                 return true;
             }
         }
-        return false;
+        throw new NoSuchElementException();
     }
 
     @Override
     public int indexOf(Account account) {
+        Objects.requireNonNull(account);
         for (int i = 0; i < this.size; i++) {
             if (this.accounts[i].equals(account)) {
                 return i;
@@ -235,6 +257,24 @@ public class Individual implements Client, Cloneable {
             }
         }
         return totalDebt;
+    }
+
+    private void checkNumber(String number) {
+        if (!Pattern.compile(Client.NUMBER_REGEX_PATTERN).matcher(number).matches()) {
+            throw new InvalidAccountNumberException("Invalid account number");
+        }
+    }
+
+    private void checkIndex(int index) {
+        if (index < 0 || index >= this.size) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    private void throwExceptionIfHasAccount(String number) throws DublicateAccountNumberException {
+        if (hasAccount(number)) {
+            throw new DublicateAccountNumberException();
+        }
     }
 
     @Override
