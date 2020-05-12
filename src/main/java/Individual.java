@@ -1,5 +1,4 @@
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -88,9 +87,9 @@ public class Individual implements Client, Cloneable {
     public Account getAccount(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
-        for (int i = 0; i < this.size; i++) {
-            if (checkNumber(this.accounts[i], number)) {
-                return this.accounts[i];
+        for (Account account : this) {
+            if (checkNumber(account, number)) {
+                return account;
             }
         }
         throw new NoSuchElementException();
@@ -104,8 +103,8 @@ public class Individual implements Client, Cloneable {
     public boolean hasAccount(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
-        for (int i = 0; i < this.size; i++) {
-            if (checkNumber(this.accounts[i], number)) {
+        for (Account account : this) {
+            if (checkNumber(account, number)) {
                 return true;
             }
         }
@@ -150,9 +149,9 @@ public class Individual implements Client, Cloneable {
     public Account[] getAccounts() {
         int j = 0;
         Account[] accounts = new DebitAccount[this.size];
-        for (int i = 0; i < this.size; i++) {
+        for (Account account : this) {
             if (this.accounts != null) {
-                accounts[j++] = this.accounts[i];
+                accounts[j++] = account;
             }
         }
         return accounts;
@@ -160,24 +159,16 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public Account[] sortedAccountsByBalance() {
-        Account[] sortedAccounts = new DebitAccount[this.size];
-        int j;
-        for (int i = 0; i < this.size; i++) {
-            j = i;
-            while (j > 0 && sortedAccounts[j - 1].getBalance() > this.accounts[i].getBalance()) {
-                sortedAccounts[j] = sortedAccounts[j - 1];
-                j--;
-            }
-            sortedAccounts[j] = this.accounts[i];
-        }
-        return sortedAccounts;
+        Account[] accounts = getAccounts();
+        Arrays.sort(accounts);
+        return accounts;
     }
 
     @Override
     public double totalBalance() {
         double totalBalance = 0;
-        for (int i = 0; i < this.size; i++) {
-            totalBalance += this.accounts[i].getBalance();
+        for (Account account : this) {
+            totalBalance += account.getBalance();
         }
         return totalBalance;
     }
@@ -196,9 +187,9 @@ public class Individual implements Client, Cloneable {
     public Account[] getCredits() {
         Account[] credits = new Account[countCredits()];
         int j = 0;
-        for (int i = 0; i < this.size; i++) {
-            if (this.accounts[i] instanceof Credit) {
-                credits[j++] = this.accounts[i];
+        for (Account account : this) {
+            if (account instanceof Credit) {
+                credits[j++] = account;
             }
         }
         return credits;
@@ -206,8 +197,8 @@ public class Individual implements Client, Cloneable {
 
     public int countCredits() {
         int quantity = 0;
-        for (int i = 0; i < this.size; i++) {
-            if (this.accounts[i] instanceof Credit) {
+        for (Account account : this) {
+            if (account instanceof Credit) {
                 quantity++;
             }
         }
@@ -247,10 +238,8 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public double totalDebt() {
-        Account account;
         double totalDebt = 0;
-        for (int i = 0; i < this.size; i++) {
-            account = this.accounts[i];
+        for (Account account : this) {
             if (account instanceof CreditAccount) {
                 totalDebt += (account.getBalance() / 100)
                         * ((CreditAccount) account).getAnnualPercentageRate();
@@ -275,6 +264,11 @@ public class Individual implements Client, Cloneable {
         if (hasAccount(number)) {
             throw new DublicateAccountNumberException();
         }
+    }
+
+    @Override
+    public Iterator<Account> iterator() {
+        return new AccountIterator();
     }
 
     @Override
@@ -319,5 +313,23 @@ public class Individual implements Client, Cloneable {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    private class AccountIterator implements Iterator<Account> {
+
+        private int i = 0;
+
+        @Override
+        public boolean hasNext() {
+            return i < size;
+        }
+
+        @Override
+        public Account next() {
+            if (i < size) {
+                return accounts[i++];
+            }
+            throw new NoSuchElementException();
+        }
     }
 }

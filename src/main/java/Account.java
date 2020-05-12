@@ -3,7 +3,7 @@ import java.time.LocalDate;
 /**
  * @author Dmitriy Antipin
  */
-public interface Account {
+public interface Account extends Comparable<Account> {
 
     String getNumber();
 

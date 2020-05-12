@@ -1,7 +1,7 @@
 /**
  * @author Dmitriy Antipin
  */
-public interface Client {
+public interface Client extends Iterable<Account>, Comparable<Client> {
 
     String NUMBER_REGEX_PATTERN = "4[045]\\d{3}810\\d{4}[1-9]\\d{6}[1-9]";
 
@@ -55,5 +55,10 @@ public interface Client {
         } else {
             return ClientStatus.PLATINUM;
         }
+    }
+
+    @Override
+    default int compareTo(Client o) {
+        return Double.compare(totalBalance(), o.totalBalance());
     }
 }

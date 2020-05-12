@@ -98,6 +98,11 @@ public abstract class AbstractAccount implements Account, Cloneable {
     }
 
     @Override
+    public int compareTo(Account o) {
+        return Double.compare(this.balance, o.getBalance());
+    }
+
+    @Override
     public String toString() {
         return String.format("number: %s balance: %f", number, balance);
     }

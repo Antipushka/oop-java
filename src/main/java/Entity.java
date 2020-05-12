@@ -1,5 +1,7 @@
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
@@ -86,9 +88,9 @@ public class Entity implements Client, Cloneable {
     public Account getAccount(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
-        for (Node node = this.head.next; node != this.tail.next; node = node.next) {
-            if (checkNumber(node.account, number)) {
-                return node.account;
+        for (Account account : this) {
+            if (checkNumber(account, number)) {
+                return account;
             }
         }
         throw new NoSuchElementException();
@@ -102,8 +104,8 @@ public class Entity implements Client, Cloneable {
     public boolean hasAccount(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
-        for (Node node = this.head.next; node != this.tail.next; node = node.next) {
-            if (checkNumber(node.account, number)) {
+        for (Account account : this) {
+            if (checkNumber(account, number)) {
                 return true;
             }
         }
@@ -182,8 +184,8 @@ public class Entity implements Client, Cloneable {
     @Override
     public double totalBalance() {
         double totalBalance = 0;
-        for (Node node = this.head.next; node != this.head; node = node.next) {
-            totalBalance += node.account.getBalance();
+        for (Account account : this) {
+            totalBalance += account.getBalance();
         }
         return totalBalance;
     }
@@ -210,9 +212,9 @@ public class Entity implements Client, Cloneable {
     public Account[] getCredits() {
         Account[] credits = new Account[countCredits()];
         int i = 0;
-        for (Node node = this.head.next; node != this.head; node = node.next) {
-            if (node.account instanceof Credit) {
-                credits[i++] = node.account;
+        for (Account account : this) {
+            if (account instanceof Credit) {
+                credits[i++] = account;
             }
         }
         return credits;
@@ -220,12 +222,10 @@ public class Entity implements Client, Cloneable {
 
     public int countCredits() {
         int quantity = 0;
-        Node node = this.head.next;
-        while (node != this.head) {
-            if (node.account instanceof Credit) {
+        for (Account account : this) {
+            if (account instanceof Credit) {
                 quantity++;
             }
-            node = node.next;
         }
         return quantity;
     }
@@ -257,10 +257,8 @@ public class Entity implements Client, Cloneable {
 
     @Override
     public double totalDebt() {
-        Account account;
         double totalDebt = 0;
-        for (Node node = this.head.next; node != this.head; node = node.next) {
-            account = node.account;
+        for (Account account : this) {
             if (account instanceof CreditAccount) {
                 totalDebt += (account.getBalance() / 100)
                         * ((CreditAccount) account).getAnnualPercentageRate();
@@ -285,6 +283,11 @@ public class Entity implements Client, Cloneable {
         if (hasAccount(number)) {
             throw new DublicateAccountNumberException();
         }
+    }
+
+    @Override
+    public Iterator<Account> iterator() {
+        return new AccountIterator();
     }
 
     @Override
@@ -367,6 +370,26 @@ public class Entity implements Client, Cloneable {
         @Override
         public int hashCode() {
             return Objects.hash(account, next);
+        }
+    }
+
+    private class AccountIterator implements Iterator<Account> {
+
+        private Node node = head.next;
+
+        @Override
+        public boolean hasNext() {
+            return node != head;
+        }
+
+        @Override
+        public Account next() {
+            if (hasNext()) {
+                Account account = node.account;
+                node = node.next;
+                return account;
+            }
+            throw new NoSuchElementException();
         }
     }
 }

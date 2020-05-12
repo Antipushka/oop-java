@@ -1,10 +1,12 @@
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
  * @author Dmitriy Antipin
  */
 
-public class AccountManager {
+public class AccountManager implements Iterable<Client> {
 
     private static final int DEFAULT_SIZE = 0;
 
@@ -89,9 +91,9 @@ public class AccountManager {
     public Client[] getClients() {
         int j = 0;
         Client[] clients = new Client[this.size];
-        for (int i = 0; i < this.size; i++) {
-            if (this.clients[i] != null) {
-                clients[j++] = this.clients[i];
+        for (Client client : this) {
+            if (client != null) {
+                clients[j++] = client;
             }
         }
         return clients;
@@ -136,12 +138,15 @@ public class AccountManager {
     public Account setAccount(String accountNumber, DebitAccount account) throws DublicateAccountNumberException {
         Objects.requireNonNull(accountNumber);
         Objects.requireNonNull(account);
-        for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.clients[i].size(); j++) {
-                if (this.clients[i].getAccount(j).getNumber().equals(accountNumber)) {
-                    return this.clients[i].setAccount(account, j);
+        int j = 0;
+        for (Client client : this) {
+            for (Account a : client) {
+                if (a.getNumber().equals(accountNumber)) {
+                    return client.setAccount(account, j);
                 }
+                j++;
             }
+            j = 0;
         }
         return null;
     }
@@ -149,9 +154,9 @@ public class AccountManager {
     public Client[] getDebtors() {
         int j = 0;
         Client[] debtors = new Client[countDebtors()];
-        for (int i = 0; i < this.size; i++) {
-            if (this.clients[i].countCredits() > 0) {
-                debtors[j++] = this.clients[i];
+        for (Client client : this) {
+            if (client.countCredits() > 0) {
+                debtors[j++] = client;
             }
         }
         return debtors;
@@ -160,10 +165,10 @@ public class AccountManager {
     public Client[] getWickedDebtors() {
         int j = 0;
         Client[] wickedDebtors = new Client[countWickedDebtors()];
-        for (int i = 0; i < this.size; i++) {
-            if (this.clients[i].countCredits() > 0 &&
-                    this.clients[i].getStatus() == ClientStatus.BAD) {
-                wickedDebtors[j++] = this.clients[i];
+        for (Client client : this) {
+            if (client.countCredits() > 0 &&
+                    client.getStatus() == ClientStatus.BAD) {
+                wickedDebtors[j++] = client;
             }
         }
         return wickedDebtors;
@@ -171,8 +176,8 @@ public class AccountManager {
 
     private int countDebtors() {
         int quantity = 0;
-        for (int i = 0; i < this.size; i++) {
-            if (this.clients[i].countCredits() > 0) {
+        for (Client client : this) {
+            if (client.countCredits() > 0) {
                 quantity++;
             }
         }
@@ -181,9 +186,9 @@ public class AccountManager {
 
     private int countWickedDebtors() {
         int quantity = 0;
-        for (int i = 0; i < this.size; i++) {
-            if (this.clients[i].countCredits() > 0 &&
-                    this.clients[i].getStatus() == ClientStatus.BAD) {
+        for (Client client : this) {
+            if (client.countCredits() > 0 &&
+                    client.getStatus() == ClientStatus.BAD) {
                 quantity++;
             }
         }
@@ -217,6 +222,12 @@ public class AccountManager {
         }
     }
 
+
+    @Override
+    public Iterator<Client> iterator() {
+        return new ClientIterator();
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -224,5 +235,23 @@ public class AccountManager {
             stringBuilder.append(this.clients[i].toString()).append('\n');
         }
         return stringBuilder.toString();
+    }
+
+    private class ClientIterator implements Iterator<Client> {
+
+        private int i = 0;
+
+        @Override
+        public boolean hasNext() {
+            return i < size;
+        }
+
+        @Override
+        public Client next() {
+            if (hasNext()) {
+                return clients[i++];
+            }
+            throw new NoSuchElementException();
+        }
     }
 }
