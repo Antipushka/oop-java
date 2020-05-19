@@ -33,8 +33,7 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public boolean addAccount(Account account) throws DublicateAccountNumberException {
-        throwExceptionIfHasAccount(account.getNumber());
+    public boolean add(Account account) {
         Objects.requireNonNull(account);
         ensureCapacity();
         this.accounts[size++] = account;
@@ -50,7 +49,7 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public boolean addAccount(Account account, int index) throws DublicateAccountNumberException {
+    public boolean add(Account account, int index) throws DublicateAccountNumberException {
         throwExceptionIfHasAccount(account.getNumber());
         Objects.requireNonNull(account);
         checkIndex(index);
@@ -68,7 +67,7 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public Account getAccount(int index) {
+    public Account get(int index) {
         checkIndex(index);
         return this.accounts[index];
     }
@@ -84,7 +83,7 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public Account getAccount(String number) {
+    public Account get(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
         for (Account account : this) {
@@ -112,7 +111,7 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public Account removeAccount(int index) {
+    public Account remove(int index) {
         checkIndex(index);
         Account removable = this.accounts[index];
         shiftLeft(index);
@@ -126,7 +125,87 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public Account removeAccount(String number) {
+    public boolean isEmpty() {
+        return this.size == 0;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        for (Account account : this) {
+            if (account.equals(o)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        int i = 0;
+        for (Account account : this) {
+            a[i++] = (T) account;
+        }
+        return a;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        for (int i = 0; i < this.size; i++) {
+            if (this.accounts[i].equals(o)) {
+                remove(i);
+                this.size--;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        for (Object object : c) {
+            if (!contains(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Account> c) {
+        for (Account account : c) {
+            add(account);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        for (Object object : c) {
+            remove(object);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        for (Account account : this) {
+            if (!c.contains(account)) {
+                remove(account);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void clear() {
+        for (int i = this.size; i >= 0; i--) {
+            this.accounts[i] = null;
+            this.size--;
+        }
+    }
+
+    @Override
+    public Account remove(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
         for (int i = 0; i < this.size; i++) {
@@ -146,7 +225,7 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public Account[] getAccounts() {
+    public Account[] toArray() {
         int j = 0;
         Account[] accounts = new DebitAccount[this.size];
         for (Account account : this) {
@@ -159,9 +238,10 @@ public class Individual implements Client, Cloneable {
 
     @Override
     public Account[] sortedAccountsByBalance() {
-        Account[] accounts = getAccounts();
-        Arrays.sort(accounts);
-        return accounts;
+        Account[] accounts = toArray();
+        List<Account> sortedAccounts = new ArrayList<Account>(Arrays.asList(accounts));
+        Collections.sort(sortedAccounts);
+        return sortedAccounts;
     }
 
     @Override
@@ -184,12 +264,11 @@ public class Individual implements Client, Cloneable {
     }
 
     @Override
-    public Account[] getCredits() {
-        Account[] credits = new Account[countCredits()];
-        int j = 0;
+    public Collection<Account> getCredits() {
+        LinkedList<Account> credits = new LinkedList<>();
         for (Account account : this) {
             if (account instanceof Credit) {
-                credits[j++] = account;
+                credits.add(account);
             }
         }
         return credits;
@@ -213,12 +292,11 @@ public class Individual implements Client, Cloneable {
         this.name = name;
     }
 
-    @Override
-    public boolean removeAccount(Account account) {
+    public boolean remove(Account account) {
         Objects.requireNonNull(account);
         for (int i = 0; i < this.size; i++) {
             if (this.accounts[i].equals(account)) {
-                removeAccount(i);
+                remove(i);
                 return true;
             }
         }

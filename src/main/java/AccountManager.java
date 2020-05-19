@@ -1,6 +1,4 @@
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Dmitriy Antipin
@@ -99,19 +97,12 @@ public class AccountManager implements Iterable<Client> {
         return clients;
     }
 
-    public Client[] sortedByBalanceIndividuals() {
-        Client[] sortedClients = new Client[this.size];
-        int j;
-        double totalBalance;
-        for (int i = 0; i < this.size; i++) {
-            j = i;
-            totalBalance = this.clients[i].totalBalance();
-            while (j > 0 && sortedClients[j - 1].totalBalance() > totalBalance) {
-                sortedClients[j] = sortedClients[j - 1];
-                j--;
-            }
-            sortedClients[j] = this.clients[i];
+    public List<Client> sortedByBalanceClients() {
+        List<Client> sortedClients = new ArrayList<>(this.size);
+        for (Client client : this) {
+            sortedClients.add(client);
         }
+        Collections.sort(sortedClients);
         return sortedClients;
     }
 
@@ -120,7 +111,7 @@ public class AccountManager implements Iterable<Client> {
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
-            account = this.clients[i++].getAccount(accountNumber);
+            account = this.clients[i++].get(accountNumber);
         }
         return account;
     }
@@ -130,7 +121,7 @@ public class AccountManager implements Iterable<Client> {
         int i = 0;
         Account account = null;
         while (account == null && i < this.size) {
-            account = this.clients[i++].removeAccount(accountNumber);
+            account = this.clients[i++].remove(accountNumber);
         }
         return account;
     }
@@ -151,24 +142,22 @@ public class AccountManager implements Iterable<Client> {
         return null;
     }
 
-    public Client[] getDebtors() {
-        int j = 0;
-        Client[] debtors = new Client[countDebtors()];
+    public Set<Client> getDebtors() {
+        Set<Client> debtors = new HashSet<>(countDebtors());
         for (Client client : this) {
             if (client.countCredits() > 0) {
-                debtors[j++] = client;
+                debtors.add(client);
             }
         }
         return debtors;
     }
 
-    public Client[] getWickedDebtors() {
-        int j = 0;
-        Client[] wickedDebtors = new Client[countWickedDebtors()];
+    public Set<Client> getWickedDebtors() {
+        Set<Client> wickedDebtors = new HashSet<>(countWickedDebtors());
         for (Client client : this) {
             if (client.countCredits() > 0 &&
                     client.getStatus() == ClientStatus.BAD) {
-                wickedDebtors[j++] = client;
+                wickedDebtors.add(client);
             }
         }
         return wickedDebtors;

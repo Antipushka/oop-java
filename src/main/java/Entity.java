@@ -1,7 +1,4 @@
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -41,26 +38,25 @@ public class Entity implements Client, Cloneable {
     public boolean addAll(Account[] accounts) throws DublicateAccountNumberException {
         Objects.requireNonNull(accounts);
         for (int i = 0; i < accounts.length; i++) {
-            addAccount(accounts[i]);
+            add(accounts[i]);
         }
         return true;
     }
 
     @Override
-    public boolean addAccount(Account account) throws DublicateAccountNumberException {
+    public boolean add(Account account) {
         Objects.requireNonNull(account);
-        throwExceptionIfHasAccount(account.getNumber());
         this.tail.next = new Node(account, this.head);
         this.size++;
         return true;
     }
 
     @Override
-    public boolean addAccount(Account account, int index) throws DublicateAccountNumberException {
+    public boolean add(Account account, int index) throws DublicateAccountNumberException {
         Objects.requireNonNull(account);
         checkIndex(index);
         if (index == this.size) {
-            addAccount(account);
+            add(account);
         } else {
             Node node = getNode(index - 1);
             Node shifted = node.next;
@@ -80,12 +76,12 @@ public class Entity implements Client, Cloneable {
     }
 
     @Override
-    public Account getAccount(int index) {
+    public Account get(int index) {
         return getNode(index).account;
     }
 
     @Override
-    public Account getAccount(String number) {
+    public Account get(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
         for (Account account : this) {
@@ -124,7 +120,7 @@ public class Entity implements Client, Cloneable {
     }
 
     @Override
-    public Account removeAccount(int index) {
+    public Account remove(int index) {
         checkIndex(index);
         Node node = getNode(index - 1);
         Account account = node.next.account;
@@ -134,7 +130,7 @@ public class Entity implements Client, Cloneable {
     }
 
     @Override
-    public Account removeAccount(String number) {
+    public Account remove(String number) {
         Objects.requireNonNull(number);
         checkNumber(number);
         for (Node node = this.head; node.next != this.head; node = node.next) {
@@ -154,7 +150,7 @@ public class Entity implements Client, Cloneable {
     }
 
     @Override
-    public Account[] getAccounts() {
+    public Account[] toArray() {
         Node node = this.head.next;
         Account[] accounts = new Account[this.size];
         for (int i = 0; i < this.size; i++) {
@@ -166,18 +162,8 @@ public class Entity implements Client, Cloneable {
 
     @Override
     public Account[] sortedAccountsByBalance() {
-        Node node = this.head.next;
-        Account[] sortedAccounts = new Account[this.size];
-        int j;
-        for (int i = 0; i < this.size; i++) {
-            j = i;
-            while (j > 0 && sortedAccounts[j - 1].getBalance() > node.account.getBalance()) {
-                sortedAccounts[j] = sortedAccounts[j - 1];
-                j--;
-            }
-            sortedAccounts[j] = node.account;
-            node = node.next;
-        }
+        ArrayList<Account> sortedAccounts = new ArrayList<>(this);
+        Collections.sort(sortedAccounts);
         return sortedAccounts;
     }
 
@@ -209,12 +195,11 @@ public class Entity implements Client, Cloneable {
     }
 
     @Override
-    public Account[] getCredits() {
-        Account[] credits = new Account[countCredits()];
-        int i = 0;
+    public Collection<Account> getCredits() {
+        LinkedList<Account> credits = new LinkedList<>();
         for (Account account : this) {
             if (account instanceof Credit) {
-                credits[i++] = account;
+                credits.add(account);
             }
         }
         return credits;
@@ -231,11 +216,12 @@ public class Entity implements Client, Cloneable {
     }
 
     @Override
-    public boolean removeAccount(Account account) {
+    public boolean remove(Object account) {
         Objects.requireNonNull(account);
         for (Node node = this.head.next; node != this.head; node = node.next) {
             if (node.next.account.equals(account)) {
                 node.next = node.next.next;
+                this.size--;
                 return true;
             }
         }
@@ -265,6 +251,73 @@ public class Entity implements Client, Cloneable {
             }
         }
         return totalDebt;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.size == 0;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        for (Account account : this) {
+            if (account.equals(o)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        int i = 0;
+        for (Account account : this) {
+            a[i++] = (T) account;
+        }
+        return a;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        for (Object object : c) {
+            if (!contains(object)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Account> c) {
+        for (Account account : c) {
+            add(account);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        for (Object object : c) {
+            remove(object);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        for (Account account : this) {
+            if (!c.contains(account)) {
+                remove(account);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void clear() {
+        for (Account account : this) {
+            remove(account);
+        }
     }
 
     private void checkNumber(String number) {

@@ -1,13 +1,14 @@
 import java.time.LocalDate;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
  * @author Dmitriy Antipin
  */
 public class Test {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws DublicateAccountNumberException {
 
-        /*DebitAccount account0 = new DebitAccount("9", LocalDate.now());
+        DebitAccount account0 = new DebitAccount("9", LocalDate.now());
         DebitAccount account1 = new DebitAccount("8", LocalDate.now());
         DebitAccount account2 = new DebitAccount("7", LocalDate.now());
         DebitAccount account3 = new DebitAccount("6", LocalDate.now());
@@ -22,27 +23,27 @@ public class Test {
         Individual individual = new Individual(accounts);
 
         Individual individual1 = new Individual(3);
-        individual1.addAccount(account3);
-        individual1.addAccount(account4);
-        individual1.addAccount(account5);
+        individual1.add(account3);
+        individual1.add(account4);
+        individual1.add(account5);
 
         Individual individual2 = new Individual();
-        individual2.addAccount(account6);
-        individual2.addAccount(account7);
-        individual2.addAccount(account8);
+        individual2.add(account6);
+        individual2.add(account7);
+        individual2.add(account8);
 
         System.out.println("Individual: ");
-        printAccounts(individual.getAccounts());
+        printAccounts(individual.toArray());
 
         System.out.println();
 
         System.out.println("Individual1: ");
-        printAccounts(individual1.getAccounts());
+        printAccounts(individual1.toArray());
 
         System.out.println();
 
         System.out.println("Individual2: ");
-        printAccounts(individual2.getAccounts());
+        printAccounts(individual2.toArray());
 
         removeTest(individual);
 
@@ -57,9 +58,7 @@ public class Test {
         AccountManager accountManager = new AccountManager(individuals);
         accountManager.addIndividual(individual2);
 
-        printTotalBalances(accountManager.sortedByBalanceIndividuals());*/
-        String regex = "4[4-5]\\d{3}810\\d{4}[1-9]\\d{6}[1-9]";
-        System.out.println(Pattern.compile(regex).matcher("45333810555512222271").matches());
+        printTotalBalances(accountManager.sortedByBalanceClients());
     }
 
     public static void printAccounts(Account[] accounts) {
@@ -69,17 +68,17 @@ public class Test {
     }
 
     public static void removeTest(Individual individual) {
-        individual.removeAccount("8");
+        individual.remove("8");
         System.out.println();
         System.out.println("Remove: ");
-        printAccounts(individual.getAccounts());
+        printAccounts(individual.toArray());
     }
 
-    public static void setTest(Individual individual) {
+    public static void setTest(Individual individual) throws DublicateAccountNumberException {
         individual.setAccount(new DebitAccount("123", LocalDate.now()), 1);
         System.out.println();
         System.out.println("Set: ");
-        printAccounts(individual.getAccounts());
+        printAccounts(individual.toArray());
     }
 
     public static void sortTest(Individual individual) {
@@ -93,10 +92,10 @@ public class Test {
         System.out.println("Total balance: " + individual.totalBalance());
     }
 
-    public static  void printTotalBalances(Client[] clients) {
+    public static  void printTotalBalances(List<Client> clients) {
         System.out.println();
-        for (int i = 0; i < clients.length; i++) {
-            System.out.println("Total balance " + i +": " + clients[i].totalBalance());
+        for (int i = 0; i < clients.size(); i++) {
+            System.out.println("Total balance " + i +": " + clients.get(i).totalBalance());
         }
     }
 }

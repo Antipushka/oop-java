@@ -1,35 +1,31 @@
+import java.util.Collection;
+
 /**
  * @author Dmitriy Antipin
  */
-public interface Client extends Iterable<Account>, Comparable<Client> {
+public interface Client extends Iterable<Account>, Comparable<Client>, Collection<Account> {
 
     String NUMBER_REGEX_PATTERN = "4[045]\\d{3}810\\d{4}[1-9]\\d{6}[1-9]";
 
-    boolean addAccount(Account account) throws DublicateAccountNumberException;
+    boolean add(Account account);
 
-    boolean addAccount(Account account, int index) throws DublicateAccountNumberException;
+    boolean add(Account account, int index) throws DublicateAccountNumberException;
 
-    Account getAccount(int index);
+    Account get(int index);
 
-    Account getAccount(String number);
+    Account get(String number);
 
     boolean hasAccount(String number);
 
     Account setAccount(Account account, int index) throws DublicateAccountNumberException;
 
-    Account removeAccount(int index);
+    Account remove(int index);
 
-    Account removeAccount(String number);
-
-    boolean removeAccount(Account account);
+    Account remove(String number);
 
     int indexOf(Account account);
 
     double totalDebt();
-
-    int size();
-
-    Account[] getAccounts();
 
     Account[] sortedAccountsByBalance();
 
@@ -39,7 +35,7 @@ public interface Client extends Iterable<Account>, Comparable<Client> {
 
     void increaseCreditScores(int value);
 
-    Account[] getCredits();
+    Collection<Account> getCredits();
 
     int countCredits();
 
